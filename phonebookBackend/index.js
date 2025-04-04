@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 
 let persons = [
   {
@@ -56,6 +57,24 @@ app.delete("/api/persons/:id", (request, response) => {
   persons = persons.filter((person) => person.id !== id);
 
   response.status(204).end();
+});
+
+//step 5: add a new person
+app.post("/api/persons", (request, response) => {
+  const person = request.body;
+  if (!person.name || !person.number) {
+    return response.status(400).json({ error: "name or number missing" });
+  }
+  const maxId = persons.length > 0 ? Math.max(...persons.map((p) => p.id)) : 0;
+  const id = maxId + 1;
+  const newPerson = {
+    id: id,
+    name: person.name,
+    number: person.number,
+  };
+  persons = persons.concat(newPerson);
+  response.json(newPerson);
+  console.log(person);
 });
 
 const PORT = 3001;
